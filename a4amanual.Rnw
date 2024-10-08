@@ -1024,6 +1024,13 @@ Figure~\ref{fig:res} shows a scatterplot of standardized residuals with a smooth
 plot(d_s)
 @
 
+When plotting residuals by default the auxiliar line is a smoother. However it's possible to use other type of lines by setting the argument "auxline" in plot. The argument can take the values used by xyplot, which are (from panel.xyplot help page) one or more of the following: "p", "l", "h", "b", "o", "s", "S", "g", "r", "a", "smooth", and "spline". If type has more than one element, an attempt is made to combine the effect of each of the components. The behaviour if any of the first five are included is similar to the effect of the corresponding type in plot: "p" and "l" stand for points and lines respectively; "b" and "o" (for ‘overlay’) plot both; "h" draws vertical (or horizontal if horizontal = TRUE) line segments from the points to the origin. Types "s" and "S" are like "l" in the sense that they join consecutive points, but instead of being joined by a straight line, points are connected by a vertical and a horizontal segment forming a ‘step’, with the vertical segment coming first for "s", and the horizontal segment coming first for "S".  "g" adds a reference grid. Type "r" adds a linear regression line, "smooth" adds a loess fit, "spline" adds a cubic smoothing spline fit, and "a" draws line segments joining the average y value for each distinct x value. Figure~\ref{fig:resaux} shows a regression line over the residuals instead of the loess smooother.  
+
+<<resaux, fig.cap="Standardized residuals for abundance indices and catch numbers (catch.n). Each panel is coded by age class, dots represent standardized residuals and lines a simple smoother.">>=
+plot(d_s, auxline="r")
+@
+
+
 The common bubble plot (\code{bubble()}) are shown in Figure~\ref{fig:bub}. It shows the same information as Figure~\ref{fig:res} but in a multivariate perspective.
 
 <<bub, fig.cap="Bubbles plot of standardized residuals for abundance indices and for catch numbers (catch.n).">>=
