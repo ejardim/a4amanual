@@ -22,7 +22,7 @@ library(knitr)
 library(formatR)
 #thm = knit_theme$get("bclear") #moe, bclear
 #knit_theme$set(thm)
-opts_chunk$set(dev='png', cache=TRUE, fig.align='center', warning=FALSE, message=FALSE, dev.args=list(type="cairo"), dpi=96, highlight=TRUE, background='#F2F2F2', fig.lp="fig:", fig.pos="H", width=70, tidy=TRUE, out.width='.9\\linewidth')
+opts_chunk$set(dev='png', cache=TRUE, fig.align='center', warning=FALSE, message=FALSE, dev.args=list(type="cairo"), dpi=250, highlight=TRUE, background='#F2F2F2', fig.lp="fig:", fig.pos="H", width=70, tidy=TRUE, out.width='.9\\linewidth')
 # lattice theme
 @
 
@@ -97,7 +97,7 @@ plot(res01)
 
 Which is even clearer when plotting the residuals by age across years.
 
-<<meanresbyage, fig.cap="Mean fit residuals by age)">>=
+<<meanresbyage, fig.cap="Mean fit residuals by age)",  out.extra = "angle=90", out.height="18cm", out.width="25cm", fig.height=8, fig.width=12>>=
 plot(res01, auxline="l", by="age")
 @
 
@@ -118,7 +118,7 @@ plot(res02)
 
 The residuals plot by age shows the same outcome.  
 
-<<fageresbyage, fig.cap="f age effect fit residuals by age)">>=
+<<fageresbyage, fig.cap="f age effect fit residuals by age)",  out.extra = "angle=90", out.height="18cm", out.width="25cm", fig.height=8, fig.width=12>>=
 plot(res02, auxline="l", by="age")
 @
 
@@ -135,7 +135,7 @@ plot(res03)
 
 The residuals plot by age shows the same outcome.  
 
-<<qageresbyage, fig.cap="q age effect fit residuals by age)">>=
+<<qageresbyage, fig.cap="q age effect fit residuals by age)",  out.extra = "angle=90", out.height="18cm", out.width="25cm", fig.height=8, fig.width=12>>=
 plot(res03, auxline="l", by="age")
 @
 
@@ -152,7 +152,7 @@ plot(res04)
 
 The residuals plot by age shows the same outcome.  
 
-<<fqageresbyage, fig.cap="q age effect fit residuals by age)">>=
+<<fqageresbyage, fig.cap="q age effect fit residuals by age)",  out.extra = "angle=90", out.height="18cm", out.width="25cm", fig.height=8, fig.width=12>>=
 plot(res04, auxline="l", by="age")
 @
 
@@ -173,7 +173,7 @@ plot(res05)
 
 The residuals plot by age shows the same outcome.  
 
-<<fyearresbyage, fig.cap="f year effect fit residuals by age)">>=
+<<fyearresbyage, fig.cap="f year effect fit residuals by age)",  out.extra = "angle=90", out.height="18cm", out.width="25cm", fig.height=8, fig.width=12>>=
 plot(res05, auxline="l", by="age")
 @
 
@@ -196,7 +196,7 @@ plot(res06)
 
 The residuals by age (figure~\ref{fig:n1resbyage}) the residuals' improvement in the first year of the catch at age time series (bottom left plots).  
 
-<<n1resbyage, fig.cap="f year effect fit residuals by age)">>=
+<<n1resbyage, fig.cap="f year effect fit residuals by age)",  out.extra = "angle=90", out.height="18cm", out.width="25cm", fig.height=8, fig.width=12>>=
 plot(res06, auxline="l", by="age")
 @
 
@@ -215,7 +215,7 @@ The residuals plot by year are very useful to see the effect of adding a varying
 plot(res07)
 @
 
-<<srresbyage, fig.cap="f year effect fit residuals by age)">>=
+<<srresbyage, fig.cap="f year effect fit residuals by age)",  out.extra = "angle=90", out.height="18cm", out.width="25cm", fig.height=8, fig.width=12>>=
 plot(res07, auxline="l", by="age")
 @
 
@@ -251,7 +251,7 @@ res08 <- residuals(fit08, ple4, ple4.index)
 plot(res08)
 @
 
-<<fksresbyage, fig.cap="f year effect fit residuals by age)">>=
+<<fksresbyage, fig.cap="f year effect fit residuals by age)",  out.extra = "angle=90", out.height="18cm", out.width="25cm", fig.height=8, fig.width=12>>=
 plot(res08, auxline="l", by="age")
 @
 
@@ -283,7 +283,7 @@ res09 <- residuals(fit09, ple4, ple4.index)
 plot(res09, auxline="r")
 @
 
-<<srksresbyage, fig.cap="f year effect fit residuals by age)">>=
+<<srksresbyage, fig.cap="f year effect fit residuals by age)",  out.extra = "angle=90", out.height="18cm", out.width="25cm", fig.height=8, fig.width=12>>=
 plot(res09, auxline="l", by="age")
 @
 
@@ -299,14 +299,14 @@ res10 <- residuals(fit10, ple4, ple4.index)
 To see what's happening with the variance model one can use predict to plot the different models fitted.
 
 <<vagepredbyage, fig.cap="Variance models for catch at age">>=
-flqs <- FLQuants(mod10=predict(fit10)$vmodel$catch[,"2022"], mod09=predict(fit09)$vmodel$catch[,"2022"])
+flqs <- FLQuants(mod10=predict(fit10)$vmodel$catch[,"2017"], mod09=predict(fit09)$vmodel$catch[,"2017"])
 xyplot(data~age, data=flqs, group=qname, type="l", auto.key=T)
 @
 
 To see the effect these models have on the estimated quantities one can look at the variance of the estimates:
 
 <<vage, fig.cap="Estimates of population abundance with different variance models">>=
-flqs <- FLQuants(mod10=catch.n(ple4+simulate(fit10, nsim=500))[,"2022"], mod09=catch.n(ple4+simulate(fit09, nsim=500))[,"2022"])
+flqs <- FLQuants(mod10=catch.n(ple4+simulate(fit10, nsim=500))[,"2017"], mod09=catch.n(ple4+simulate(fit09, nsim=500))[,"2017"])
 bwplot(data~qname|factor(age),  data=as.data.frame(flqs), scales="free", auto.key=T)
 @
 
@@ -316,7 +316,7 @@ and the usual residuals
 plot(res10, auxline="r")
 @
 
-<<vageresbyage, fig.cap="f year effect fit residuals by age)">>=
+<<vageresbyage, fig.cap="f year effect fit residuals by age)",  out.extra = "angle=90", out.height="18cm", out.width="25cm", fig.height=8, fig.width=12>>=
 plot(res10, auxline="l", by="age")
 @
 
