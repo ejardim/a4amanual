@@ -1091,6 +1091,36 @@ AIC(fit)
 BIC(fit)
 @
 
+%\subsection{The package a4adiags}
+
+%The package \code{a4adiags} contains some additional diagnostics based on the \textcolor{red}{reference}. Runs test checks weather the residuals are randomly distributed. A "run" is a sequence of the same sign residuals. Few runs indicate a trend or a correlation in the residuals while too many runs may suggest overfitting. 
+
+%The primary output of a runstest is a p-value where: a high p value $(p\leq 0.05)$ suggests that the residuals are randomly distributed, a low p value indicates a non-random pattern in the residuals.
+
+%<<>>=
+%library(a4adiags)
+%theme_set(theme_bw())
+%fit <- sca(mut09, mut09.idx, fmod = ~factor(age) + s(year, k = 8))
+%res <- residuals(fit, mut09, mut09.idx)
+%@
+
+%<<idxrunstest, fig.cap="Runstest for the abundance index">>=
+%plotRunstest(fit, mut09.idx, combine = F) + theme_bw() + facet_wrap(~age)
+%@
+
+%<<catchrunstest, fig.cap="Runstest for the catch by age">>=
+%plotRunstest(catch.n(mut09), catch.n(mut09 + fit), combine = F) + theme_bw() + facet_wrap(~age)
+%@
+
+%Green shading indicates no evidence $(p <  0.05)$ and red shading evidence $(p  >0.05)$ to reject the hypothesis of a randomly distributed time-series of residuals, respectively. The shaded (green/red) area spans three residual standard deviations to either side from zero, and the red points outside of the shading violate the ‘ $3\sigma$ limit’ for that series.
+
+%Hindcast is used to assess the prediction skill of the model by removing a couple of years from the end of the time series and forecasting for that years, to assess how close the projected values are to the ones assessed by the model. The hindcast can estimate forecast bias by comparing the forecasted values to the reference model estimates. The `a4adiags` package use a different approach, it is based on a technique proposed by Kell \textcolor{red}{ref} named hindcast cross-validation where the forecasted values are compared with the observed ones. Additionally mean absolute squared error is computed, a statistic for evaluating the prediction skill. MASE basically compares the model prediction skill against a random walk, i.e against the predicted value of a random process based only on the previous year's observation.
+
+%<<xcval, fig.cap="Hindcasting and MASE statistic. A MASE score > 1 indicates that the average model forecasts are worse than a random walk. Conversely, a MASE score of 0.5 indicates that the model forecasts twice as accurately as a naïve baseline prediction; thus, the model has prediction skill">>=
+%xval <- a4ahcxval(mut09, FLIndices(mut09.idx), nyears = 5, nsq = 3, fmodel = ~factor(age) + s(year, k = 8))
+%plotXval2(xval$indices) + ggtitle(paste0("Hindcast"))
+%@
+
 \section{Predict and simulate}\label{sec:predsim}
 
 % To predict and simulate ``R`` uses the methods `predict()` and `simulate()`, which were implemented in ``FLa4a`` in the same fashion.
@@ -1201,61 +1231,146 @@ BIC(fit)
 %
 \section{The statistical catch-at-age stock assessment framework with MCMC}\label{sec:mcmc}
 
-% The previous methods were demonstrated using the maximum likelihood estimation method. However, `ADMB` can also use MCMC methods to fit the model. This section shows how the `sca` and `sca` methods interface with ADMB to use the MCMC fits.
-%
-% The likelihood estimate is
-%
-% <<>>=
-% # ll
-% fit <- sca(ple4, ple4.indices)
-% fit <- simulate(fit, 1000)
-% @
-%
-% To run the MCMC estimate, one needs to configure a set of arguments, which is done by creating a `SCAMCMC` object. For details on the MCMC configuration in ``ADMB`` visit the ADMB website.
-%
-% <<>>=
-% # mcmc
-% mc <- SCAMCMC()
-% # check the default pars
-% mc
-% @
-%
-% Defaults for now are ok, so lets fit the model. Note that the argument `fit` ius set to *MCMC* and the argument `mcmc` takes the `SCAMCMC` object. A major check when running MCMC is the acceptance rate, which should be around 0.3. This is a rule of thumb, for more information read the (extensive) literature on MCMC. The slot `fitSumm` stores that information.
-%
-% <<>>=
-% # fit the model
-% fitmc1 <- sca(ple4, ple4.indices, fit="MCMC", mcmc=mc)
-% # check acceptance rate
-% fitSumm(fitmc1)
-% @
-%
-% We use the package `CODA` to run the diagnostics on MCMC fits. First one can plot chains using coda. Note the mcmc object is a matrix with the parameters (row = iters, cols= pars).
-%
-% <<eval=FALSE>>=
-% fitmc1.mc <- as.mcmc(fitmc1)
-% plot(fitmc1.mc)
-% @
-%
-% The usual summary plot,
-%
-% <<>>=
-% plot(ple4 + fitmc1)
-% @
-%
-% As mentioned above ``ADMB`` has several options for MCMC. Here we demonstrate one of them, `mcprobe` which sets a fat-tailed proposal distribution, as an example of how to use the `SCAMCMC` objects.
-%
-% <<>>=
-% mc <- SCAMCMC(mcmc=10000, mcsave=200, mcprobe=0.4)
-% fitmc2 <- sca(ple4, ple4.indices, fit="MCMC", mcmc=mc)
-% @
-%
-% All fits together
-%
-% <<fig.width=8, fig.height=10>>=
-% plot(FLStocks(ll=ple4 + fit, mc0=ple4 + fitmc1, mcalt=ple4 + fitmc2))
-% @
-%
+The previous methods were demonstrated using the maximum likelihood estimation method. However, \code{ADMB} can also use MCMC methods to fit the model. This section shows how the \code{sca} methods interface with ADMB to use the MCMC fits. For this section we'll use the hake assessment in mediterranean areas (gsa) 1, 5, 6 and 7.
+
+The likelihood estimate is:
+
+
+<<>>=
+# ll
+data(hke1567)
+data(hke1567.idx)
+fmod <- ~s(age, k = 4) + s(year, k = 8) + s(year, k = 8, by = as.numeric(age == 0)) + s(year, k = 8, by = as.numeric(age == 4))
+qmod <- list(~I(1/(1 + exp(-age))))
+fit <- sca(hke1567, hke1567.idx, fmodel=fmod, qmodel=qmod)
+fit <- simulate(fit, 1000)
+@
+
+To run the MCMC method, one needs to configure a set of arguments, which is done by creating a \code{SCAMCMC} object. For details on the MCMC configuration in \code{ADMB} visit the ADMB website.
+
+<<>>=
+# mcmc
+mc <- SCAMCMC()
+# check the default pars
+mc
+@
+
+Defaults for now are ok, so lets fit the model. Note that the argument \code{fit} must be set to \code{MCMC} and the argument \code{mcmc} takes the \code{SCAMCMC} object. A major check when running MCMC is the acceptance rate, which should be around 0.3. This is a rule of thumb, for more information read the (extensive) literature on MCMC. The slot \code{fitSumm} stores that information.
+
+<<>>=
+# fit the model
+fitmc00 <- sca(hke1567, hke1567.idx, fmodel=fmod, qmodel=qmod, fit = "MCMC", mcmc=mc)
+# check acceptance rate
+fitSumm(fitmc00)
+@
+
+<<>>=
+plot(hke1567 + fitmc00)
+@
+
+As mentioned above \code{ADMB} has several options for MCMC. Here we demonstrate one of them, \code{mcprobe} which sets a fat-tailed proposal distribution, as an example of how to use the \code{SCAMCMC} objects.
+
+<<>>=
+mc <- SCAMCMC(mcprobe=0.45)
+fitmc01 <- sca(hke1567, hke1567.idx, fmodel=fmod, qmodel=qmod, fit = "MCMC", mcmc=mc)
+@
+
+All fits together
+
+<<>>=
+plot(FLStocks(ll=hke1567 + fit, mc=hke1567 + fitmc00, mc_alt=hke1567 + fitmc01))
+@
+
 \subsubsection{Diagnostics with CODA}
+
+We use the package \code{CODA} to run the diagnostics on MCMC fits. One needs to convert the \aFa output into a \code{mcmc} CODA object over which several diagostics can be ran. The mcmc object is a matrix with the parameters (row = iters, cols= pars).
+
+Common diagnostics for MCMC chains is to look at the burn-in period and auto-correlation. The first can be dealt by droping an initial set of iterations, which is done using the function \code{burnin}. The latter is set by the parameter \code{mcsave N}, which defines the iteration's saving rate (the inverse of the thinning rate). This is the rate at which samples of the parameters are saved, such that thinning is effectively discarding draws.
+
+Next fit will run 1000 iterations and save every iter (\code{mcsave=1}). 
+
+<<>>=
+library(coda)
+mc <- SCAMCMC(mcmc=1000, mcsave=1)
+fitmc02 <- sca(hke1567, hke1567.idx, fmodel=fmod, qmodel=qmod, fit = "MCMC", mcmc=mc)
+fitmc02.mc <- FLa4a::as.mcmc(fitmc02)
+@
+
+The autocorrelation plots will show the very strong correlation across samples, which we want to avoid. ~\ref{fig:acf01} shows autocorrelation for the first parameter.
+
+<<acf01>>=
+acf(fitmc02.mc[,1])
+@
+
+Ploting the chain for the parameter clearly shows the autocorrelation but also the burnin phase, where there's no information about the parameter. These iterations must to be dropped. 
+
+<<chain01>>=
+xyplot(fitmc02.mc[,1])
+@
+
+It's also important to check if the distribution of the parameters is normal, which can be done with the \code{densityplot}:
+
+<<dens01>>=
+densityplot(fitmc02.mc[,1])
+@
+
+Another interesting diagnostic is the Geweke-Brooks Z-score check. This diagnostic indicates if the first and last part of a sample from a Markov chain may not be drawn from the same distribution. It's useful to decide if the first few iterations should e discarded.
+
+<<gew01>>=
+geweke.plot(fitmc02.mc[,1])
+@
+
+It's clear from the above diagnostics that a burnin phase of about 200 iterations should be considered. With relation to thining one needs to try several values until no autocorrelation exits. 
+
+Next fit will run 10000 iterations and save every iter (\code{mcsave=10}), so that the same 1000 iters are generated by the method. 
+
+<<>>=
+mc <- SCAMCMC(mcmc=10000, mcsave=10)
+fitmc03 <- sca(hke1567, hke1567.idx, fmodel=fmod, qmodel=qmod, fit = "MCMC", mcmc=mc)
+fitmc03.mc <- FLa4a::as.mcmc(fitmc03)
+@
+
+The autocorrelation plots still shows a strong correlation across samples, although less than in the previous model.
+
+<<>>=
+acf(fitmc03.mc[,1])
+@
+
+Next fit will run 100000 iterations and save every iter (\code{mcsave=100}), so that the same 1000 iters are generated by the method. Autocorrelation is much weaker, could still be reduced by increasing \code{mcsave}. 
+
+<<>>=
+mc <- SCAMCMC(mcmc=100000, mcsave=100)
+fitmc03 <- sca(hke1567, hke1567.idx, fmodel=fmod, qmodel=qmod, fit = "MCMC", mcmc=mc)
+fitmc03.mc <- FLa4a::as.mcmc(fitmc03)
+@
+
+Next fit will run 200000 iterations and save every iter (\code{mcsave=200}). 
+
+<<>>=
+mc <- SCAMCMC(mcmc=200000, mcsave=200)
+fitmc03 <- sca(hke1567, hke1567.idx, fmodel=fmod, qmodel=qmod, fit = "MCMC", mcmc=mc)
+fitmc03.mc <- FLa4a::as.mcmc(fitmc03)
+@
+
+<<>>=
+acf(fitmc03.mc[,1])
+@
+
+All diagnostics improved with the new thining rate although some other improvements can be done. Note this diagnostics should b echecked for all parameters. For the sake of space the demonstration uses only on the first.
+
+<<>>=
+xyplot(fitmc03.mc[,1])
+@
+
+<<>>=
+densityplot(fitmc03.mc[,1])
+@
+
+<<>>=
+geweke.plot(fitmc03.mc[,1])
+@
+
+The manual "A Guide for Bayesian Analysis in AD Model Builder" by Cole C. Monnahan, Melissa L. Muradian and Peter T. Kuriyam describe and explain a larger group of arguments that can be set when running MCMC with ADMB, which the engine \aFa uses. 
 
 \subsubsection{Confidence interval coverage and MCMC setup}
 
