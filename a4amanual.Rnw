@@ -1091,28 +1091,28 @@ AIC(fit)
 BIC(fit)
 @
 
-%\subsection{The package a4adiags}
+\subsection{The package a4adiags}
 
-%The package \code{a4adiags} contains some additional diagnostics based on the \textcolor{red}{reference}. Runs test checks weather the residuals are randomly distributed. A "run" is a sequence of the same sign residuals. Few runs indicate a trend or a correlation in the residuals while too many runs may suggest overfitting. 
+The package \code{a4adiags} contains some additional diagnostics based on the \textcolor{red}{reference}. Runs test checks weather the residuals are randomly distributed. A "run" is a sequence of the same sign residuals. Few runs indicate a trend or a correlation in the residuals while too many runs may suggest overfitting. 
 
-%The primary output of a runstest is a p-value where: a high p value $(p\leq 0.05)$ suggests that the residuals are randomly distributed, a low p value indicates a non-random pattern in the residuals.
+The primary output of a runstest is a p-value where: a high p value $(p\leq 0.05)$ suggests that the residuals are randomly distributed, a low p value indicates a non-random pattern in the residuals.
 
-%<<>>=
-%library(a4adiags)
-%theme_set(theme_bw())
-%fit <- sca(mut09, mut09.idx, fmod = ~factor(age) + s(year, k = 8))
-%res <- residuals(fit, mut09, mut09.idx)
-%@
+<<>>=
+library(a4adiags)
+theme_set(theme_bw())
+fit <- sca(mut09, mut09.idx, fmod = ~factor(age) + s(year, k = 8))
+res <- residuals(fit, mut09, mut09.idx)
+@
 
-%<<idxrunstest, fig.cap="Runstest for the abundance index">>=
-%plotRunstest(fit, mut09.idx, combine = F) + theme_bw() + facet_wrap(~age)
-%@
+<<idxrunstest, fig.cap="Runstest for the abundance index">>=
+plotRunstest(fit, mut09.idx, combine = F) + theme_bw() + facet_wrap(~age)
+@
 
-%<<catchrunstest, fig.cap="Runstest for the catch by age">>=
-%plotRunstest(catch.n(mut09), catch.n(mut09 + fit), combine = F) + theme_bw() + facet_wrap(~age)
-%@
+<<catchrunstest, fig.cap="Runstest for the catch by age">>=
+plotRunstest(catch.n(mut09), catch.n(mut09 + fit), combine = F) + theme_bw() + facet_wrap(~age)
+@
 
-%Green shading indicates no evidence $(p <  0.05)$ and red shading evidence $(p  >0.05)$ to reject the hypothesis of a randomly distributed time-series of residuals, respectively. The shaded (green/red) area spans three residual standard deviations to either side from zero, and the red points outside of the shading violate the ‘ $3\sigma$ limit’ for that series.
+Green shading indicates no evidence $(p <  0.05)$ and red shading evidence $(p  >0.05)$ to reject the hypothesis of a randomly distributed time-series of residuals, respectively. The shaded (green/red) area spans three residual standard deviations to either side from zero, and the red points outside of the shading violate the ‘ $3\sigma$ limit’ for that series.
 
 %Hindcast is used to assess the prediction skill of the model by removing a couple of years from the end of the time series and forecasting for that years, to assess how close the projected values are to the ones assessed by the model. The hindcast can estimate forecast bias by comparing the forecasted values to the reference model estimates. The `a4adiags` package use a different approach, it is based on a technique proposed by Kell \textcolor{red}{ref} named hindcast cross-validation where the forecasted values are compared with the observed ones. Additionally mean absolute squared error is computed, a statistic for evaluating the prediction skill. MASE basically compares the model prediction skill against a random walk, i.e against the predicted value of a random process based only on the previous year's observation.
 
@@ -1471,37 +1471,8 @@ Not sure this section will stay or subsections will be merged in other sections 
 %
 \section{A potential stock assessment workflow}\label{sec:saworkflow}
 
-% Here we show a simple example of using the assessment model using plaice in the North Sea. The default settings of the stock assessment model work reasonably well. It's an area of research that will improve with time. Note that because the survey index for plaice has missing values we get a warning saying that we assume these values are missing at random.
-%
-% <<>>=
-% data(ple4)
-% data(ple4.indices)
-% fit <- sca(ple4, ple4.indices)
-% @
-%
-% To inspect the stock assessment summary constituted of trends of fishing mortality (harvest), spawning stock biomass (SSB), catch and recruits, the user may add the `a4aFit` object to the original `FLStock` object using the `+` method and plot the result (`r fign('summ')`).
-%
-% <<summ, fig.cap="Stock summary for Plaice in ICES area IV, recruits, SSB (Stock Spawning Biomass), catch (catch and landings) and harvest (fishing mortality or F).">>=
-% stk <- ple4 + fit
-% plot(stk)
-% @
-%
-% In more detail, one can plot a 3D representation of fishing mortality (`r fign('F')`),
-%
-% <<F, fig.cap="3D contour plot of estimated fishing mortality at age and year">>=
-% wireframe(harvest(fit), zlab="F")
-% @
-%
-% population abundance (`r fign('N')`) is displaid as a 3D wireframe,
-%
-% <<N, fig.cap="Population abundance by age and year", echo=FALSE>>=
-% wireframe(stock.n(fit), zlab="N")
-% @
-%
-% as well as catch-at-age (`r fign('C')`).
-%
-% <<C, fig.cap="Catches in number of individuals by age and year", echo=FALSE>>=
-% wireframe(catch.n(fit), zlab="C")
-% @
-%
+
+
+
+
 \end{document}

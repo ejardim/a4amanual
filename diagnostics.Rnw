@@ -10,21 +10,18 @@ The package `a4adiags` contains some additional diagnostics based on the \textco
     - A low p value indicates a non-random pattern in the residuals
 
 <<>>=
-library(FLa4a)
-library(FLCore)
 library(a4adiags)
-library(ggplot2);theme_set(theme_bw())
-rm(list = ls())
-fit05 <- sca(mut09, mut09.idx, fmod = ~factor(age) + s(year, k = 8))
-res05 <- residuals(fit05, mut09, mut09.idx)
+theme_set(theme_bw())
+fit <- sca(mut09, mut09.idx, fmod = ~factor(age) + s(year, k = 8))
+res <- residuals(fit, mut09, mut09.idx)
 @
 
 <<idxrunstest, fig.cap="Runstest for the abundance index">>=
-plotRunstest(fit05, mut09.idx, combine = F) + theme_bw() + facet_wrap(~age)
+plotRunstest(fit, mut09.idx, combine = F) + theme_bw() + facet_wrap(~age)
 @
 
 <<catchrunstest, fig.cap="Runstest for the catch by age">>=
-plotRunstest(catch.n(mut09), catch.n(mut09 + fit05), combine = F) + theme_bw() + facet_wrap(~age)
+plotRunstest(catch.n(mut09), catch.n(mut09 + fit), combine = F) + theme_bw() + facet_wrap(~age)
 @
 
 Green shading indicates no evidence $(p <  0.05)$ and red shading evidence $(p  >0.05)$ to reject the hypothesis of a randomly distributed time-series of residuals, respectively. The shaded (green/red) area spans three residual standard deviations to either side from zero, and the red points outside of the shading violate the ‘ $3\sigma$ limit’ for that series.
